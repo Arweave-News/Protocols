@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ArweaveNews AMA</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <script src="https://unpkg.com/arweave/bundles/web.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+
+<body style="background-color: lightgray">
+  <div id="app">
+  <label for="file-upload" id="file" style="margin-left: 1em">
+    tap to login.
+</label>
+
+
+<style type="text/css">
+  input[type="file"] {
+    display: none;
+}
+</style>
+<input id="file-upload" type="file" onchange="getJwk(this)">
+
+<center><h1>ARWEAVE NEWS AMA</h1></center>
+
+
+
+  <article style="margin-left: 2em; margin-right: 2em">
+    
+    <center>
+    <h2>Insert AMA id:</h2><br>
+    <input type="text" name="" v-model="ama_id" id="ama_id" placeholder="e.g @ardrive_103238279_AMA" class="form-control">
+    <br><br>
+    <div v-if="ama_id">
+      <h2>Please write your question below</h2>
+    <br>
+    <input v-model="question" id="question" class="form-control">
+    <button v-if="question" class="form-control" id="send" onclick="checkAma()">tap to send</button>
+
+    </div>
+
+    <br>
+    <p id="q_id"></p>
+  </center>
+
+  </article>
+
+
+
+</div>
+
+<script type="text/javascript" src="ama.js"></script>
+
+</body>
+</html>
