@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ArweaveNews AMA</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <script src="https://unpkg.com/arweave/bundles/web.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+
+<body style="background-color: lightgray">
+  <div id="app">
+  <label for="file-upload" id="file" style="margin-left: 1em">
+    tap to login.
+</label>
+
+
+<style type="text/css">
+  input[type="file"] {
+    display: none;
+}
+</style>
+<input id="file-upload" type="file" onchange="getJwk(this)">
+
+<center><img src="https://arweave.net/D__8jxBXPv4Koihgat3OypblXQOliqW3Jpv1y7I-7_0" style="max-width: 250px; max-height: 250px"></center>
+
+<br>
+
+  <article style="margin-left: 2em; margin-right: 2em">
+    
+    <center>
+    <h2>create AMA:</h2><br>
+    <input type="text" id="ama_id"  class="form-control" >
+    <br><br>
+   
+    <button class="form-control" id="create" onclick="create()">create</button>
+
+
+    <br>
+    <p id="ama_txid"></p>
+  </center>
+
+  </article>
+
+
+
+</div>
+
+<script type="text/javascript" src="create_ama.js"></script>
+
+</body>
+</html>
