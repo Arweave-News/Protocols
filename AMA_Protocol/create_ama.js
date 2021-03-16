@@ -49,7 +49,7 @@ async function create() {
   await arweave.transactions.sign(tx, JSON.parse(privateKey));
   await arweave.transactions.post(tx)
 
-  document.getElementById("ama_txid").innerHTML = `AMA TXID: ${tx.id}`
-
+  document.getElementById("ama_txid").innerHTML = `AMA TXID: ${tx.id}
+AMA ID: ${compatible_id}`
 }
 
