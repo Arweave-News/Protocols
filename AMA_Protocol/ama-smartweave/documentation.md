@@ -8,5 +8,8 @@ This protocol introduces an all new method to create and organize AMAs (Ask Me A
 
 <center><img src="./workflow.png"></center>
 
+## AMA guest submitting answers:
+<center><img src="./answers-workflow.png"></center>
+
 # License 
 This protocol is licensed uner the MIT license
