@@ -6,7 +6,7 @@ This protocol introduces an all new method to create and organize AMAs (Ask Me A
 # Workflow
 ## Creating AMA and questions submission:
 
-<center><img src="./ama-wokflow.jpg"></center>
+<center><img src="./workflow.png"></center>
 
 # License 
 This protocol is licensed uner the MIT license
