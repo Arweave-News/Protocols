@@ -1,15 +1,15 @@
 
-
 export async function handle (state, action) {
     const caller = action.caller
     const input = action.input
     const ama = state.ama
 
     const blockheight = SmartWeave.block.height
+    // the address used by ArweaveNews to organize AMAs
     const verifiedCreator = "gLiSx5agTs1qgDfsUNelHQXno8qHl8G_48FNcmB3KJs"
 
     if (input.function === "createAMA") {
-        // guest name or nichname
+        // guest name or nickname
         const guest = input.guest
         // AMA period in days (time of accepting questions)
         const period = input.period
@@ -40,7 +40,7 @@ export async function handle (state, action) {
 
         const amaID = SmartWeave.transaction.id
         const timeline = blockheight + (720 * period)
-
+        // create an AMA object and set metadata
         ama[amaID] = {
             "guest": guest,
             "endOn": timeline,
@@ -75,12 +75,12 @@ export async function handle (state, action) {
         }
 
         const questionTXID = SmartWeave.transaction.id
-
+        // add the question object to the questions array
         ama[amaID]["questions"].push({
             "QID": questionTXID,
             "question": question,
             "asker": caller,
-            "timestamp": Date.now()
+            "atBlockheight": blockheight
         })
 
         return {state}
@@ -114,17 +114,18 @@ export async function handle (state, action) {
         }
 
         const answerTXID = SmartWeave.transaction.id
-
+        // add the answer object to the answers array
         ama[amaID]["answers"].push({
             "answerTo": questionID,
             "answer": answer,
             "answerTXID": answerTXID,
-            "timestamp": Date.now()
+            "atBlockheight": blockheight
 
         })
 
         return {state}
 
     }
+    throw new ContractError(`unknown function supplied: ${input.function}`)
 }
 
