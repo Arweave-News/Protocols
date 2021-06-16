@@ -80,7 +80,7 @@ export async function handle (state, action) {
             "QID": questionTXID,
             "question": question,
             "asker": caller,
-            "timestamp": Date.now()
+            "atBlockheight": blockheight
         })
 
         return {state}
@@ -119,12 +119,13 @@ export async function handle (state, action) {
             "answerTo": questionID,
             "answer": answer,
             "answerTXID": answerTXID,
-            "timestamp": Date.now()
+            "atBlockheight": blockheight
 
         })
 
         return {state}
 
     }
+    throw new ContractError(`unknown function supplied: ${input.function}`)
 }
 
