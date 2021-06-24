@@ -128,7 +128,41 @@ export async function handle (state, action) {
         })
 
         return {state}
+    }
+    
 
+    /**
+     * the following funtions require "verifiedCreator" permission.
+     * 
+     * forceStop: ends an AMA before its deadline
+     * addCreator: an existing verified creator can add other creators
+     * removeCreator: a creator can remove him/her-self from the verifiedCreators array
+     * 
+     **/
+
+    if (input.function == "forceStop") {
+        const amaID = input.id
+        const currentBlockHeight = SmartWeave.block.height
+
+        if (! ama[amaID]) {
+            throw new ContractError(`AMA having id : ${amaID} not found`)
+        }
+
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`You don't have permission to invoke this function`)
+        }
+
+        if (ama[amaID]["endOn"] < currentBlockHeight) {
+            throw new ContractError(`AMA already closed`)
+        }
+
+        //if the AMA is not ended,
+        //set it's "endOn" value to
+        // the current network blockheight
+
+        ama[amaID]["endOn"] = currentBlockHeight
+
+        return { state }
     }
     throw new ContractError(`unknown function supplied: ${input.function}`)
 }
