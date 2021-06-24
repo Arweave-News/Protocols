@@ -3,11 +3,11 @@ export async function handle (state, action) {
     const caller = action.caller
     const input = action.input
     const ama = state.ama
+    const verifiedCreators = state.verifiedCreator
 
     const blockheight = SmartWeave.block.height
     // the address used by ArweaveNews to organize AMAs
-    const verifiedCreator = "gLiSx5agTs1qgDfsUNelHQXno8qHl8G_48FNcmB3KJs"
-
+    
     if (input.function === "createAMA") {
         // guest name or nickname
         const guest = input.guest
@@ -18,8 +18,8 @@ export async function handle (state, action) {
         // The address of the guest which will be used by them to answer the questions
         const guestAddress = input.guestAddress
 
-        if (caller !== verifiedCreator) {
-            throw new ContractError(`only ${verifiedCreator} can invoke this function`)
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`your address is not recognized as verified creator`)
         }
 
         if (typeof guest !== "string") {
@@ -36,6 +36,10 @@ export async function handle (state, action) {
 
         if (! Number.isInteger(reward)) {
             throw new ContractError(`invalid reward amount`)
+        }
+        
+        if (reward > 25) {
+            throw new ContractError(`reward amount per user is too high`)
         }
 
         const amaID = SmartWeave.transaction.id
