@@ -184,6 +184,28 @@ export async function handle (state, action) {
 
         return { state }
     }
+    
+    if (input.function === "removeCreator") {
+        const address = input.address
+
+        if (! verifiedCreators.includes(address)) {
+            throw new ContractError(`${address} is not found in verifiedCreators`)
+        }
+
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`You don't have permission to invoke this function`)
+        }
+
+        if (caller !== address) {
+            throw new ContractError(`only the creator can call this function`)
+        }
+
+        const addressIndex = verifiedCreators.indexOf(address)
+        verifiedCreators.splice(addressIndex, 1)
+
+        return { state }
+
+    }
     throw new ContractError(`unknown function supplied: ${input.function}`)
 }
 
