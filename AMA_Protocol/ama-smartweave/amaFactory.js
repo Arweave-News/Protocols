@@ -164,6 +164,26 @@ export async function handle (state, action) {
 
         return { state }
     }
+    
+    if (input.function === "addCreator") {
+        const address = input.address
+
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`You don't have permission to invoke this function`)
+        }
+
+        if (typeof address !== "string" || address.length !== 43) {
+            throw new ContractError(`invalid Arweave address`)
+        }
+
+        if (verifiedCreators.includes(address)) {
+            throw new ContractError(`${address} already exist in verifiedCreators array`)
+        }
+
+        verifiedCreators.push(address)
+
+        return { state }
+    }
     throw new ContractError(`unknown function supplied: ${input.function}`)
 }
 
