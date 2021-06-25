@@ -3,11 +3,11 @@ export async function handle (state, action) {
     const caller = action.caller
     const input = action.input
     const ama = state.ama
+    const verifiedCreators = state.verifiedCreator
 
     const blockheight = SmartWeave.block.height
     // the address used by ArweaveNews to organize AMAs
-    const verifiedCreator = "gLiSx5agTs1qgDfsUNelHQXno8qHl8G_48FNcmB3KJs"
-
+    
     if (input.function === "createAMA") {
         // guest name or nickname
         const guest = input.guest
@@ -18,8 +18,8 @@ export async function handle (state, action) {
         // The address of the guest which will be used by them to answer the questions
         const guestAddress = input.guestAddress
 
-        if (caller !== verifiedCreator) {
-            throw new ContractError(`only ${verifiedCreator} can invoke this function`)
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`your address is not recognized as verified creator`)
         }
 
         if (typeof guest !== "string") {
@@ -36,6 +36,10 @@ export async function handle (state, action) {
 
         if (! Number.isInteger(reward)) {
             throw new ContractError(`invalid reward amount`)
+        }
+        
+        if (reward > 25) {
+            throw new ContractError(`reward amount per user is too high`)
         }
 
         const amaID = SmartWeave.transaction.id
@@ -124,6 +128,82 @@ export async function handle (state, action) {
         })
 
         return {state}
+    }
+    
+
+    /**
+     * the following funtions require "verifiedCreator" permission.
+     * 
+     * forceStop: ends an AMA before its deadline
+     * addCreator: an existing verified creator can add other creators
+     * removeCreator: a creator can remove him/her-self from the verifiedCreators array
+     * 
+     **/
+
+    if (input.function == "forceStop") {
+        const amaID = input.id
+        const currentBlockHeight = SmartWeave.block.height
+
+        if (! ama[amaID]) {
+            throw new ContractError(`AMA having id : ${amaID} not found`)
+        }
+
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`You don't have permission to invoke this function`)
+        }
+
+        if (ama[amaID]["endOn"] < currentBlockHeight) {
+            throw new ContractError(`AMA already closed`)
+        }
+
+        //if the AMA is not ended,
+        //set it's "endOn" value to
+        // the current network blockheight
+
+        ama[amaID]["endOn"] = currentBlockHeight
+
+        return { state }
+    }
+    
+    if (input.function === "addCreator") {
+        const address = input.address
+
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`You don't have permission to invoke this function`)
+        }
+
+        if (typeof address !== "string" || address.length !== 43) {
+            throw new ContractError(`invalid Arweave address`)
+        }
+
+        if (verifiedCreators.includes(address)) {
+            throw new ContractError(`${address} already exist in verifiedCreators array`)
+        }
+
+        verifiedCreators.push(address)
+
+        return { state }
+    }
+    
+    if (input.function === "removeCreator") {
+        const address = input.address
+
+        if (! verifiedCreators.includes(address)) {
+            throw new ContractError(`${address} is not found in verifiedCreators`)
+        }
+
+        if (! verifiedCreators.includes(caller)) {
+            throw new ContractError(`You don't have permission to invoke this function`)
+        }
+
+        if (caller !== address) {
+            throw new ContractError(`only the creator can call this function`)
+        }
+
+        const addressIndex = verifiedCreators.indexOf(address)
+        verifiedCreators.splice(addressIndex, 1)
+
+        return { state }
 
     }
     throw new ContractError(`unknown function supplied: ${input.function}`)
