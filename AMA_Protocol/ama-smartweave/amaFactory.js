@@ -49,6 +49,7 @@ export async function handle (state, action) {
             "guest": guest,
             "endOn": timeline,
             "reward": reward,
+            "id": amaID,
             "guestAddress": guestAddress,
             "questions": [],
             "answers": []
@@ -84,7 +85,8 @@ export async function handle (state, action) {
             "QID": questionTXID,
             "question": question,
             "asker": caller,
-            "atBlockheight": blockheight
+            "atBlockheight": blockheight,
+            "id": amaID
         })
 
         return {state}
@@ -122,8 +124,9 @@ export async function handle (state, action) {
         ama[amaID]["answers"].push({
             "answerTo": questionID,
             "answer": answer,
-            "answerTXID": answerTXID,
-            "atBlockheight": blockheight
+            "AID": answerTXID,
+            "atBlockheight": blockheight,
+            "id": amaID
 
         })
 
