@@ -133,6 +133,18 @@ export async function handle (state, action) {
         return {state}
     }
     
+    if (input.function === "status") {
+        const amaID = input.id
+        const currentBlockHeight = SmartWeave.block.height
+
+        if (! ama[amaID]) {
+            throw new ContractError(`invalid AMA ID`)
+        }
+
+        const status = currentBlockHeight < ama[amaID]["endOn"] ? "ongoing" : "done"
+
+        return {result: status}
+    }
 
     /**
      * the following funtions require "verifiedCreator" permission.
