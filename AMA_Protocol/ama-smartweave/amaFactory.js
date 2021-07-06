@@ -17,6 +17,8 @@ export async function handle (state, action) {
         const reward = input.reward
         // The address of the guest which will be used by them to answer the questions
         const guestAddress = input.guestAddress
+        //some info about the guest.
+        const description = input.description
 
         if (! verifiedCreators.includes(caller)) {
             throw new ContractError(`your address is not recognized as verified creator`)
@@ -41,6 +43,14 @@ export async function handle (state, action) {
         if (reward > 25) {
             throw new ContractError(`reward amount per user is too high`)
         }
+        
+        if (typeof description !== "string") {
+            throw new ContractError(`wrong value type`)
+        }
+
+        if (description.length > 350) {
+            throw new ContractError(`description too long`)
+        }
 
         const amaID = SmartWeave.transaction.id
         const timeline = blockheight + (720 * period)
@@ -51,6 +61,7 @@ export async function handle (state, action) {
             "reward": reward,
             "id": amaID,
             "guestAddress": guestAddress,
+            "description": description,
             "questions": [],
             "answers": []
         }
