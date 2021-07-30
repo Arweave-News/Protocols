@@ -10,13 +10,13 @@ export async function handle (state, action) {
     
     if (input.function === "createAMA") {
         // guest name or nickname
-        const guest = input.guest
+        const guests = input.guests
         // AMA period in days (time of accepting questions)
         const period = input.period
         // ARN reward for each answered question
         const reward = input.reward
         // The address of the guest which will be used by them to answer the questions
-        const guestAddress = input.guestAddress
+        const guestAddresses = input.guestAddresses
         //some info about the guest.
         const description = input.description
 
@@ -30,10 +30,6 @@ export async function handle (state, action) {
 
         if (! Number.isInteger(period)) {
             throw new ContractError(`invalid period type`)
-        }
-
-        if (typeof guestAddress !== "string" || guestAddress.length !== 43) {
-            throw new ContractError(`invalid address`)
         }
 
         if (! Number.isInteger(reward)) {
@@ -56,11 +52,11 @@ export async function handle (state, action) {
         const timeline = blockheight + (720 * period)
         // create an AMA object and set metadata
         ama[amaID] = {
-            "guest": guest,
+            "guests": guests.split(","),
             "endOn": timeline,
             "reward": reward,
             "id": amaID,
-            "guestAddress": guestAddress,
+            "guestAddresses": guestAddresses.split(","),
             "description": description,
             "questions": [],
             "answers": []
@@ -120,7 +116,7 @@ export async function handle (state, action) {
             throw new ContractError(`too high question length`)
         }
 
-        if (caller !== ama[amaID]["guestAddress"]) {
+        if (! ama[amaID]["guestAddresses"].includes(caller)) {
             throw new ContractError(`only the guest can answer the questions`)
         }
 
