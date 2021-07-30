@@ -4,6 +4,7 @@ export async function handle (state, action) {
     const input = action.input
     const ama = state.ama
     const verifiedCreators = state.verifiedCreator
+    const logs = state.logs
 
     const blockheight = SmartWeave.block.height
     // the address used by ArweaveNews to organize AMAs
