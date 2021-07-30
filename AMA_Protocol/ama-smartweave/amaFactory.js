@@ -232,6 +232,42 @@ export async function handle (state, action) {
         return { state }
 
     }
+    
+    if (input.function === "addLog") {
+        const swcID = input.swcID
+
+        if ( logs.includes(swcID) ) {
+            throw new ContractError(`SWC having ID: ${swcID} is already recorded`)
+        }
+
+        if (typeof swcID !== "string" || swcID.length !== 43) {
+            throw new ContractError(`invalid SWC ID`)
+        }
+
+        if (! verifiedCreators.includes(caller) ) {
+            throw new ContractError(`You don't have permission to perform this action`)
+        }
+
+        logs.push(swcID)
+        return { state }
+
+    }
+
+    if (input.function === "removeLog") {
+        const id = input.id 
+
+        if (! Number.isInteger(id) ) {
+            throw new ContractError(`invalid id`)
+        }
+
+        if (! logs[id]) {
+            throw new ContractError(`SWC address having ID ${id} not found`) 
+        }
+
+        logs.splice(id, 1)
+        return { state }
+    }
+
     throw new ContractError(`unknown function supplied: ${input.function}`)
 }
 
