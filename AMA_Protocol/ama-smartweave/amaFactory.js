@@ -11,13 +11,13 @@ export async function handle (state, action) {
     
     if (input.function === "createAMA") {
         // guest name or nickname
-        const guest = input.guest
+        const guests = input.guests
         // AMA period in days (time of accepting questions)
         const period = input.period
         // ARN reward for each answered question
         const reward = input.reward
         // The address of the guest which will be used by them to answer the questions
-        const guestAddress = input.guestAddress
+        const guestAddresses = input.guestAddresses
         //some info about the guest.
         const description = input.description
 
@@ -31,10 +31,6 @@ export async function handle (state, action) {
 
         if (! Number.isInteger(period)) {
             throw new ContractError(`invalid period type`)
-        }
-
-        if (typeof guestAddress !== "string" || guestAddress.length !== 43) {
-            throw new ContractError(`invalid address`)
         }
 
         if (! Number.isInteger(reward)) {
@@ -57,11 +53,11 @@ export async function handle (state, action) {
         const timeline = blockheight + (720 * period)
         // create an AMA object and set metadata
         ama[amaID] = {
-            "guest": guest,
+            "guests": guests.split(","),
             "endOn": timeline,
             "reward": reward,
             "id": amaID,
-            "guestAddress": guestAddress,
+            "guestAddresses": guestAddresses.split(","),
             "description": description,
             "questions": [],
             "answers": []
@@ -121,7 +117,7 @@ export async function handle (state, action) {
             throw new ContractError(`too high question length`)
         }
 
-        if (caller !== ama[amaID]["guestAddress"]) {
+        if (! ama[amaID]["guestAddresses"].includes(caller)) {
             throw new ContractError(`only the guest can answer the questions`)
         }
 
@@ -231,7 +227,41 @@ export async function handle (state, action) {
         verifiedCreators.splice(addressIndex, 1)
 
         return { state }
+    }
+    
+    if (input.function === "addLog") {
+        const swcID = input.swcID
 
+        if ( logs.includes(swcID) ) {
+            throw new ContractError(`SWC having ID: ${swcID} is already recorded`)
+        }
+
+        if (typeof swcID !== "string" || swcID.length !== 43) {
+            throw new ContractError(`invalid SWC ID`)
+        }
+
+        if (! verifiedCreators.includes(caller) ) {
+            throw new ContractError(`You don't have permission to perform this action`)
+        }
+
+        logs.push(swcID)
+        return { state }
+
+    }
+
+    if (input.function === "removeLog") {
+        const id = input.id 
+
+        if (! Number.isInteger(id) ) {
+            throw new ContractError(`invalid id`)
+        }
+
+        if (! logs[id]) {
+            throw new ContractError(`SWC address having ID ${id} not found`) 
+        }
+
+        logs.splice(id, 1)
+        return { state }
     }
     throw new ContractError(`unknown function supplied: ${input.function}`)
 }
