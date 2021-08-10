@@ -5,6 +5,7 @@ export async function handle (state, action) {
     const ama = state.ama
     const verifiedCreators = state.verifiedCreator
     const logs = state.logs
+    const importedContracts = state.importedContracts
 
     const blockheight = SmartWeave.block.height
     // the address used by ArweaveNews to organize AMAs
@@ -54,6 +55,7 @@ export async function handle (state, action) {
         // create an AMA object and set metadata
         ama[amaID] = {
             "guests": guests.split(","),
+            "imported": false,
             "endOn": timeline,
             "reward": reward,
             "id": amaID,
@@ -261,6 +263,39 @@ export async function handle (state, action) {
         }
 
         logs.splice(id, 1)
+        return { state }
+    }
+    
+    if ( input.function === "import") {
+        // a function to import deprecated SWC state
+        // into a new enhanced SWC 
+        const swcID = input.swcID
+
+        if (typeof swcID !== "string" || swcID.length !== 43) {
+            throw new ContractError(`invalid SWC address`)
+        }
+
+        if ( ! verifiedCreators.includes(caller)) {
+            throw new ContractError(`You don't have permission to perform this action`)
+        }
+
+        if ( importedContracts.includes(swcID) ) {
+            throw new ContractError(`Contract having ID: ${swcID} is already recorded`)
+        }
+
+        const importedContractState = await SmartWeave.contracts.readContractState(swcID)
+        const importedAmaIds = Object.keys( importedContractState["ama"] )
+
+        for ( amaID of importedAmaIds ) {
+            const importedAma = importedContractState["ama"][amaID]
+            importedAma["imported"] = true
+            // assign the imported AMA object metadata to the 
+            // current AMA SWC state
+            ama[amaID] = importedAma
+        }
+        
+        importedContracts.push(swcID)
+
         return { state }
     }
     throw new ContractError(`unknown function supplied: ${input.function}`)
