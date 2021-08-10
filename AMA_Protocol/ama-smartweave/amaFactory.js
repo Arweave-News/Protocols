@@ -25,7 +25,7 @@ export async function handle (state, action) {
             throw new ContractError(`your address is not recognized as verified creator`)
         }
 
-        if (typeof guest !== "string") {
+        if (typeof guests !== "string") {
             throw new ContractError(`invalid guest type`)
         }
 
